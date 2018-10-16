@@ -10,7 +10,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
   object GitFlowVersionKeys {
     val settings = settingKey[Settings]("All of the sbt-git-flow-version settings")
-    val policy = settingKey[VersionPolicy]("Current version policy")
+    val policy = settingKey[Seq[(BranchMatcher, VersionPolicy)]]("Current version policy")
   }
 
   override def projectSettings: Seq[Def.Setting[_]] = {
@@ -22,7 +22,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
         tagPrefix = "",
         tagSuffix = ""
       ),
-      policy := VersionPolicy.defaultPolicy,
+      policy := defaultPolicy,
       version in ThisBuild := calculateVersion(
         policy.value,
         CurrentRevision(
@@ -35,10 +35,24 @@ object GitFlowVersionPlugin extends AutoPlugin {
     )
   }
 
-  private def calculateVersion(policy: VersionPolicy, revision: CurrentRevision, settings: Settings): String = {
-    policy(revision, settings) match {
+  private def calculateVersion(policy: Seq[(BranchMatcher, VersionPolicy)], revision: CurrentRevision, settings: Settings): String = {
+    policy.find(_._1(revision.branchName).isDefined)
+      .map(_._2(revision, settings))
+      .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}")) match {
       case Right(value) => value
       case Left(error) => sys.error(error)
     }
+  }
+
+  private val defaultPolicy = {
+    import BranchMatcher._
+    import VersionPolicy._
+
+    Seq(
+      exact("master") -> currentTag,
+      prefix("release/") -> nextTag,
+      prefixes("feature/", "bugfix/", "hotfix/") -> lastTag,
+      any -> unknownVersion
+    )
   }
 }

@@ -14,3 +14,5 @@ crossSbtVersions := List("0.13.17", "1.2.4")
 enablePlugins(SbtPlugin)
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test

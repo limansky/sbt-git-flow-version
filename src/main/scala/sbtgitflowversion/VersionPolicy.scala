@@ -35,19 +35,4 @@ object VersionPolicy {
       Left(s"Don't know how to calculate version for $revision")
     }
   }
-
-  val defaultPolicy: VersionPolicy = new VersionPolicy {
-    override def apply(revision: CurrentRevision, settings: Settings): Either[String, String] = {
-      revision.branchName match {
-        case "master" => currentTag(revision, settings)
-
-        case "develop" => nextTag(revision, settings)
-
-        //    case x if x.startsWith("release/") => extractVersion
-
-        case _ => unknownVersion(revision, settings)
-      }
-    }
-  }
-
 }
