@@ -36,8 +36,10 @@ object GitFlowVersionPlugin extends AutoPlugin {
   }
 
   private def calculateVersion(policy: Seq[(BranchMatcher, VersionPolicy)], revision: CurrentRevision, settings: Settings): String = {
-    policy.find(_._1(revision.branchName).isDefined)
-      .map(_._2(revision, settings))
+    policy.iterator
+      .map { case (m, p) => m(revision.branchName).map(_ -> p) }
+      .find(_.isDefined).flatten
+      .map { case (m, p) => p(revision, settings, m.extraction) }
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}")) match {
       case Right(value) => value
       case Left(error) => sys.error(error)
@@ -50,8 +52,9 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     Seq(
       exact("master") -> currentTag,
-      prefix("release/") -> nextTag,
-      prefixes("feature/", "bugfix/", "hotfix/") -> lastTag,
+      exact("develop") -> nextTag,
+      prefix("release/") -> lastTag,
+      prefixes("feature/", "bugfix/", "hotfix/") -> lastTagWithExtra,
       any -> unknownVersion
     )
   }
