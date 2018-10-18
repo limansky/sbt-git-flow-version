@@ -4,10 +4,10 @@ jdk: oraclejdk8
 
 sudo: false
 
-matrix:
-  - include:
-    - env: SBT_VERSION="0.13.17"
-    - env: SBT_VERSION="1.2.4"
+env:
+  -matrix:
+    SBT_VERSION="0.13.17"
+    SBT_VERSION="1.2.4"
 
 script:
   - sbt "^^${SBT_VERSION}" test scripted
