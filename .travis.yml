@@ -11,3 +11,8 @@ env:
 
 script:
   - sbt "^^${SBT_VERSION}" test scripted
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
