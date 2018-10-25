@@ -2,59 +2,49 @@ package sbtgitflowversion
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import sbt.VersionNumber
 
 class VersionTest extends FlatSpec with Matchers with OptionValues with TableDrivenPropertyChecks {
-
-  "Version" should "parse string" in {
-    val data = Table(
-      ("String", "expected"),
-      ("1", Version(1, None, None, None))
-    )
-
-    forAll(data) { (s, e)  =>
-      Version.parse(s).value shouldEqual e
-    }
-  }
 
   it should "increment major version" in {
     val data = Table(
       ("old", "new"),
-      (Version(1, None, None, None), Version(2, None, None, None)),
-      (Version(3, Some(1), None, None), Version(4, Some(0), None, None)),
-      (Version(1, Some(0), Some(3), None), Version(2, Some(0), Some(0), None)),
-      (Version(11, Some(4), None, Some("foo")), Version(12, Some(0), None, Some("foo")))
+      (VersionNumber("1"), VersionNumber("2")),
+      (VersionNumber("3.1"), VersionNumber("4.0")),
+      (VersionNumber("1.0.3"), VersionNumber("2.0.0")),
+      (VersionNumber("11.4-foo"), VersionNumber("12.0-foo"))
     )
 
     forAll(data) { (o, n) =>
-      o.nextMajor shouldEqual n
+      Version.nextMajor(o) shouldEqual n
     }
   }
 
   it should "increment minor version" in {
     val data = Table(
       ("old", "new"),
-      (Version(1, None, None, None), Version(1, Some(1), None, None)),
-      (Version(3, Some(1), None, None), Version(3, Some(2), None, None)),
-      (Version(1, Some(0), Some(3), None), Version(1, Some(1), Some(0), None)),
-      (Version(11, Some(4), None, Some("foo")), Version(11, Some(5), None, Some("foo")))
+      (VersionNumber("1"), VersionNumber("1.1")),
+      (VersionNumber("3.1"), VersionNumber("3.2")),
+      (VersionNumber("1.0.3"), VersionNumber("1.1.0")),
+      (VersionNumber("11.4-foo"), VersionNumber("11.5-foo"))
     )
 
     forAll(data) { (o, n) =>
-      o.nextMinor shouldEqual n
+      Version.nextMinor(o) shouldEqual n
     }
   }
 
   it should "increment build version" in {
     val data = Table(
       ("old", "new"),
-      (Version(1, None, None, None), Version(1, Some(0), Some(1), None)),
-      (Version(3, Some(1), None, None), Version(3, Some(1), Some(1), None)),
-      (Version(1, Some(0), Some(3), Some("bar")), Version(1, Some(0), Some(4), Some("bar"))),
-      (Version(11, Some(4), None, Some("foo")), Version(11, Some(4), Some(1), Some("foo")))
+      (VersionNumber("1"), VersionNumber("1.0.1")),
+      (VersionNumber("3.1"), VersionNumber("3.1.1")),
+      (VersionNumber("1.0.3-bar"), VersionNumber("1.0.4-bar")),
+      (VersionNumber("11.4-foo"), VersionNumber("11.4.1-foo"))
     )
 
     forAll(data) { (o, n) =>
-      o.nextBuild shouldEqual n
+      Version.nextBuild(o) shouldEqual n
     }
   }
 

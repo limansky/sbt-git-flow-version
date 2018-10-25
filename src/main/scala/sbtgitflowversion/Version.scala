@@ -1,29 +1,35 @@
 package sbtgitflowversion
 
-case class Version(major: Int, minor: Option[Int], build: Option[Int], suffix: Option[String]) {
-
-  def nextMajor: Version = Version(major + 1, minor map (_ => 0), build map (_ => 0), suffix)
-
-  def nextMinor: Version = Version(major, minor.map(_ + 1) orElse Some(1), build map (_ => 0), suffix)
-
-  def nextBuild: Version = Version(major, minor orElse Some(0), build.map(_ + 1) orElse Some(1), suffix)
-
-  override def toString: String = {
-    val min = minor map (x => s".$x") getOrElse ""
-    val bld = build map (x => s".$x") getOrElse ""
-    val sfx = suffix map(x => s"-$x") getOrElse ""
-    s"$major$min$bld$sfx"
-  }
-}
+import sbt.VersionNumber
 
 object Version {
 
-  def parse(s: String): Option[Version] = {
-    val pattern = "^(\\d+)".r
+  def nextMajor(version: VersionNumber): VersionNumber = {
+    next(0, version)
+  }
 
-    s match {
-      case pattern(maj) => Some(Version(maj.toInt, None, None, None))
-      case _ => None
+  def nextMinor(version: VersionNumber): VersionNumber = {
+    next(1, version)
+  }
+
+  def nextBuild(version: VersionNumber): VersionNumber = {
+    next(2, version)
+  }
+
+  def next(n: Int, versionNumber: VersionNumber): VersionNumber = {
+    val ns = versionNumber.numbers
+    if (ns.nonEmpty) {
+      if (n < ns.length) {
+        val pre = ns.take(n)
+        val post = Seq.fill(ns.length - n - 1)(0l)
+        VersionNumber((pre :+ (ns(n) + 1)) ++ post, versionNumber.tags, versionNumber.extras)
+      } else {
+        val post = Seq.fill(ns.length - n)(0l)
+        VersionNumber(ns ++ post :+ 1l, versionNumber.tags, versionNumber.extras)
+      }
+
+    } else {
+      versionNumber
     }
   }
 
