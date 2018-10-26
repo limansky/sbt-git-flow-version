@@ -2,21 +2,27 @@ package sbtgitflowversion
 
 import sbt.VersionNumber
 
+import scala.util.Try
+
 object Version {
 
+  def parse(s: String): Option[VersionNumber] = {
+    Try(VersionNumber(s)).filter(_.numbers.nonEmpty).toOption
+  }
+
   def nextMajor(version: VersionNumber): VersionNumber = {
-    next(0, version)
+    next(0)(version)
   }
 
   def nextMinor(version: VersionNumber): VersionNumber = {
-    next(1, version)
+    next(1)(version)
   }
 
   def nextBuild(version: VersionNumber): VersionNumber = {
-    next(2, version)
+    next(2)(version)
   }
 
-  def next(n: Int, versionNumber: VersionNumber): VersionNumber = {
+  def next(n: Int)(versionNumber: VersionNumber): VersionNumber = {
     val ns = versionNumber.numbers
     if (ns.nonEmpty) {
       if (n < ns.length) {
