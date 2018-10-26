@@ -24,7 +24,7 @@ object Version {
         val post = Seq.fill(ns.length - n - 1)(0l)
         VersionNumber((pre :+ (ns(n) + 1)) ++ post, versionNumber.tags, versionNumber.extras)
       } else {
-        val post = Seq.fill(ns.length - n)(0l)
+        val post = Seq.fill(n - ns.length)(0l)
         VersionNumber(ns ++ post :+ 1l, versionNumber.tags, versionNumber.extras)
       }
 

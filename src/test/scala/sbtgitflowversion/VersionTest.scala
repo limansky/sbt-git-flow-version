@@ -6,7 +6,7 @@ import sbt.VersionNumber
 
 class VersionTest extends FlatSpec with Matchers with OptionValues with TableDrivenPropertyChecks {
 
-  it should "increment major version" in {
+  "Version" should "increment major version" in {
     val data = Table(
       ("old", "new"),
       (VersionNumber("1"), VersionNumber("2")),
