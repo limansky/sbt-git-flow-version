@@ -8,6 +8,8 @@ import sbt.Keys._
 object GitFlowVersionPlugin extends AutoPlugin {
   override def requires: Plugins = GitPlugin
 
+  override def trigger: PluginTrigger = allRequirements
+
   object GitFlowVersionKeys {
     val settings = settingKey[Settings]("All of the sbt-git-flow-version settings")
     val policy = settingKey[Seq[(BranchMatcher, VersionPolicy)]]("Current version policy")
@@ -24,6 +26,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
       ),
       policy := defaultPolicy,
       version in ThisBuild := calculateVersion(
+        sLog.value,
         policy.value,
         CurrentRevision(
           git.gitCurrentBranch.value,
@@ -35,7 +38,8 @@ object GitFlowVersionPlugin extends AutoPlugin {
     )
   }
 
-  private def calculateVersion(policy: Seq[(BranchMatcher, VersionPolicy)], revision: CurrentRevision, settings: Settings): String = {
+  private def calculateVersion(logger: Logger, policy: Seq[(BranchMatcher, VersionPolicy)], revision: CurrentRevision, settings: Settings): String = {
+    logger.info("Calculating version")
     policy.iterator
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
       .find(_.isDefined).flatten
@@ -52,9 +56,9 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     Seq(
       exact("master") -> currentTag,
-      exact("develop") -> nextTag,
-      prefix("release/") -> lastTag,
-      prefixes("feature/", "bugfix/", "hotfix/") -> lastTagWithExtra,
+      exact("develop") -> nextMinor,
+      prefix("release/") -> matching,
+      prefixes("feature/", "bugfix/", "hotfix/") -> lastTagWithMatching,
       any -> unknownVersion
     )
   }

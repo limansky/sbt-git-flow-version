@@ -12,10 +12,16 @@ object VersionPolicy {
     }
   }
 
-  val lastTagWithExtra: VersionPolicy = new VersionPolicy {
+  val lastTagWithMatching: VersionPolicy = new VersionPolicy {
     override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = {
       val last = revision.lastTag.getOrElse(settings.initialVersion)
       matching.map(m => s"$last-$m-$SNAPSHOT").toRight(s"Empty matching is not allowed for $revision")
+    }
+  }
+
+  val matching: VersionPolicy = new VersionPolicy {
+    override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = {
+      matching.toRight(s"Empty matching is not allowed for $revision")
     }
   }
 
@@ -33,7 +39,19 @@ object VersionPolicy {
     }
   }
 
-  val nextTag: VersionPolicy = new VersionPolicy {
+  val nextMajor: VersionPolicy = new VersionPolicy {
+    override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = ???
+  }
+
+  val nextMinor: VersionPolicy = new VersionPolicy {
+    override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = ???
+  }
+
+  val nextBuild: VersionPolicy = new VersionPolicy {
+    override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = ???
+  }
+
+  def nextN(n: Int): VersionPolicy = new VersionPolicy {
     override def apply(revision: CurrentRevision, settings: Settings, matching: Option[String]): Either[String, String] = ???
   }
 
