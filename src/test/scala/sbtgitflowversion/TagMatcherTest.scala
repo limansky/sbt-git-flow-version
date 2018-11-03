@@ -2,7 +2,7 @@ package sbtgitflowversion
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
-import sbt.librarymanagement.VersionNumber
+import sbt.VersionNumber
 
 class TagMatcherTest extends FlatSpec with Matchers with TableDrivenPropertyChecks {
 
