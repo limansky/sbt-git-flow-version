@@ -13,10 +13,15 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  object GitFlowVersionKeys {
-    val initialVersion = settingKey[String]("Initial version")
-    val tagMatcher = settingKey[TagMatcher]("Tag matcher")
-    val policy = settingKey[Seq[(BranchMatcher, VersionPolicy)]]("Current version policy")
+  object autoImport extends GitFlowVersionKeys {
+    val BranchMatcher = sbtgitflowversion.BranchMatcher
+    type BranchMatcher = sbtgitflowversion.BranchMatcher
+
+    val TagMatcher = sbtgitflowversion.TagMatcher
+    type TagMatcher = sbtgitflowversion.TagMatcher
+
+    val VersionCalculator = sbtgitflowversion.VersionCalculator
+    type VersionCalculator = sbtgitflowversion.VersionCalculator
   }
 
   override def projectSettings: Seq[Def.Setting[_]] = {
@@ -25,11 +30,11 @@ object GitFlowVersionPlugin extends AutoPlugin {
     Seq(
       initialVersion := "1.0.0",
       tagMatcher := TagMatcher.raw,
-      policy := defaultPolicy,
+      versionPolicy := defaultPolicy,
       version in ThisBuild := calculateVersion(
         sLog.value,
         JGit(baseDirectory.value),
-        policy.value,
+        versionPolicy.value,
         CurrentRevision(
           git.gitCurrentBranch.value,
           git.gitDescribedVersion.value,
@@ -44,7 +49,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
   private def calculateVersion(
     logger: Logger,
     jGit: JGit,
-    policy: Seq[(BranchMatcher, VersionPolicy)],
+    policy: Seq[(BranchMatcher, VersionCalculator)],
     revision: CurrentRevision,
     tagMatcher: TagMatcher,
     initialVersion: String
@@ -67,7 +72,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
   }
 
   private def applyPolicy(
-    policy: Seq[(BranchMatcher, VersionPolicy)],
+    policy: Seq[(BranchMatcher, VersionCalculator)],
     revision: CurrentRevision,
     last: VersionNumber,
     current: Option[VersionNumber]
@@ -100,7 +105,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
   private val defaultPolicy = {
     import BranchMatcher._
-    import VersionPolicy._
+    import VersionCalculator._
 
     Seq(
       exact("master") -> currentTag,

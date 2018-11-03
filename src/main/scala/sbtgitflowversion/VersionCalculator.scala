@@ -2,60 +2,60 @@ package sbtgitflowversion
 
 import sbt.VersionNumber
 
-abstract class VersionPolicy extends ((VersionNumber, Option[VersionNumber], Option[String]) => Either[String, String])
+abstract class VersionCalculator extends ((VersionNumber, Option[VersionNumber], Option[String]) => Either[String, String])
 
-object VersionPolicy {
+object VersionCalculator {
   val SNAPSHOT = "SNAPSHOT"
 
-  val lastVersion: VersionPolicy = new VersionPolicy {
+  val lastVersion: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Right(previous.toString)
     }
   }
 
-  val lastTagWithMatching: VersionPolicy = new VersionPolicy {
+  val lastTagWithMatching: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       matching.map(m => s"$previous-$m-$SNAPSHOT").toRight("Empty matching is not allowed for lastTagWithMatching policy")
     }
   }
 
-  val matching: VersionPolicy = new VersionPolicy {
+  val matching: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       matching.toRight(s"Empty matching is not allowed for matching policy")
     }
   }
 
-  val currentTag: VersionPolicy = new VersionPolicy {
+  val currentTag: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       current.map(_.toString).toRight("No tag defined for current version")
     }
   }
 
-  val nextMajor: VersionPolicy = new VersionPolicy {
+  val nextMajor: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Right(Version.nextMajor(previous).toString)
     }
   }
 
-  val nextMinor: VersionPolicy = new VersionPolicy {
+  val nextMinor: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Right(Version.nextMinor(previous).toString)
     }
   }
 
-  val nextBuild: VersionPolicy = new VersionPolicy {
+  val nextBuild: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Right(Version.nextBuild(previous).toString)
     }
   }
 
-  def nextN(n: Int): VersionPolicy = new VersionPolicy {
+  def nextN(n: Int): VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Right(Version.next(n)(previous).toString)
     }
   }
 
-  val unknownVersion: VersionPolicy = new VersionPolicy {
+  val unknownVersion: VersionCalculator = new VersionCalculator {
     override def apply(previous: VersionNumber, current: Option[VersionNumber], matching: Option[String]): Either[String, String] = {
       Left(s"Don't know how to calculate version")
     }
