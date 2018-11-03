@@ -48,4 +48,20 @@ class VersionTest extends FlatSpec with Matchers with OptionValues with TableDri
     }
   }
 
+  it should "be able to compare two versions" in {
+    val data = Table(
+      ("x", "y", "compare"),
+      (VersionNumber("1"), VersionNumber("2"), -1),
+      (VersionNumber("3"), VersionNumber("2"), 1),
+      (VersionNumber("1.0"), VersionNumber("1.0"), 0),
+      (VersionNumber("1.1.0"), VersionNumber("1.2.0"), -1),
+      (VersionNumber("1.1.1"), VersionNumber("1.1.0"), 1),
+      (VersionNumber("1.1.1"), VersionNumber("1.1"), 1)
+    )
+
+    forAll(data) { (x, y, c) =>
+      Version.versionOrdering.compare(x, y) shouldEqual c
+    }
+  }
+
 }

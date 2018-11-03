@@ -61,7 +61,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     val version = for {
       initial <- Version.parse(initialVersion).toRight("Invalid initial version").right
-      last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).headOption.getOrElse(initial)).right
+      last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
       calculated <- applyPolicy(policy, revision, last, maxCurrent).right
     } yield calculated
 
