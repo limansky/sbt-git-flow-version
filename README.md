@@ -30,8 +30,10 @@ addSbtPlugin("me.limansky" % "sbt-git-flow-vesion" % "0.1-SNAPSHOT")
 Configuration
 -------------
 
-The heart of the plugin configuration is a `policy` setting which defines version rules as a
-tuple of `BranchMatcher` and `VersionPolicy`.  Let's start with branch matchers.  Branch matcher
+### Version policy
+
+The heart of the plugin configuration is a `versionPolicy` setting which defines version rules as a
+tuple of `BranchMatcher` and `VersionCalculator`.  Let's start with branch matchers.  Branch matcher
 is a function taking branch name and returning `Option[Matching]`. Matching is a class containing
 matched branch name and optional extraction.  There are number of built-in matchers:
 
@@ -42,6 +44,15 @@ matched branch name and optional extraction.  There are number of built-in match
     groups, the first group will be returned as extraction.
   - `any` - matches any branch (might be used to define default behaviour).
 
+There are also several built in implementations for `VersionCalculator`:
+
+  - `currentTag` - take a version from a current tag. If there are several current tags it will take the
+    one with a maximal version.
+  - `nextMajor`, `nextMinor`, `nextBuild`, `nextN` - increment major, minor, build or n-th number of
+    a last version.
+  - `matching` - take a version from matching returned by `BranchMatcher`
+  - `lastTagWithMatching` - takes last version and append matching returned by `BranchMatcher`.
+  - `unknownVersion` - fails with unknown version message.
 
 So, the default policy is:
 
@@ -67,3 +78,17 @@ Which can be described as following rules:
     and the prevous version "1.0.1" the current version is "1.0.1-123-new-ui-SNAPSHOT".
   - Finally, if the branch name doesn't follow any of these rules, the build fails,
     because version is unknown.
+
+### Tag matcher
+
+By default `sbt-git-flow-version` expects version in the tags as is (e.g. "1.0.1").
+You can change this behaviour if you are using some prefixes or/and suffixes in your
+tag names.  To do that use `tagMatcher` setting with `TagMatcher` class.  Following
+tag matchers are available:
+
+  - `raw` - default tag matcher, takes the version as is.
+  - `prefix(p: String)` - tag should be started with prefix `p` (e.g. `prefix("Version_")`
+    matches version 3.2.1 from tag "Version_3.2.1").
+  - `suffix(s: String)` - tag should be ended with suffix `s`.
+  - `prefixAndSuffix(p: String, s:String)` - tag should start with prefix `p` and end with
+    suffix `s`.
