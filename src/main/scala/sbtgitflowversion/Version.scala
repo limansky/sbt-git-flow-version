@@ -39,4 +39,13 @@ object Version {
     }
   }
 
+  val versionOrdering: Ordering[VersionNumber] = new Ordering[VersionNumber] {
+    override def compare(x: VersionNumber, y: VersionNumber): Int = {
+      val pair = x.numbers.zipAll(y.numbers, 0l, 0l)
+        .find(p => java.lang.Long.compare(p._1, p._2) != 0)
+
+      pair.map(p => java.lang.Long.compare(p._1, p._2)).getOrElse(0)
+    }
+  }
+
 }
