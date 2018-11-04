@@ -24,7 +24,7 @@ Installation
 > NOTE: At the moment there is no stable version yet.  The plugin is under active development.
 
 ```Scala
-addSbtPlugin("me.limansky" % "sbt-git-flow-vesion" % "0.1-SNAPSHOT")
+addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.1-SNAPSHOT")
 ```
 
 Configuration
@@ -49,19 +49,22 @@ There are also several built in implementations for `VersionCalculator`:
   - `currentTag` - take a version from a current tag. If there are several current tags it will take the
     one with a maximal version.
   - `nextMajor`, `nextMinor`, `nextBuild`, `nextN` - increment major, minor, build or n-th number of
-    a last version.
-  - `matching` - take a version from matching returned by `BranchMatcher`
-  - `lastTagWithMatching` - takes last version and append matching returned by `BranchMatcher`.
+    a last version. The version is snapshot by default.
+  - `matching` - take a version from matching returned by `BranchMatcher`. The version is snapshot by default.
+  - `lastVersion` - previous version.  Version value is taken from last tag or `initialVersion` setting.
+    The version is not snapshot by default.
+  - `lastVersionWithMatching` - takes last version and append matching returned by `BranchMatcher`.  By default
+    new version is snapshot.
   - `unknownVersion` - fails with unknown version message.
 
 So, the default policy is:
 
 ```Scala
 Seq(
-  exact("master") -> currentTag,
-  exact("develop") -> nextMinor,
-  prefix("release/") -> matching,
-  prefixes("feature/", "bugfix/", "hotfix/") -> lastTagWithMatching,
+  exact("master") -> currentTag(),
+  exact("develop") -> nextMinor(),
+  prefix("release/") -> matching(),
+  prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
   any -> unknownVersion
 )
 ```

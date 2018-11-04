@@ -66,7 +66,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
     } yield calculated
 
     version match {
-      case Right(value) => value
+      case Right(value) => value.toString
       case Left(error) => sys.error(error)
     }
   }
@@ -76,7 +76,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
     revision: CurrentRevision,
     last: VersionNumber,
     current: Option[VersionNumber]
-  ): Either[String, String] = {
+  ): Either[String, VersionNumber] = {
     policy.iterator
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
       .find(_.isDefined).flatten
@@ -108,10 +108,10 @@ object GitFlowVersionPlugin extends AutoPlugin {
     import VersionCalculator._
 
     Seq(
-      exact("master") -> currentTag,
-      exact("develop") -> nextMinor,
-      prefix("release/") -> matching,
-      prefixes("feature/", "bugfix/", "hotfix/") -> lastTagWithMatching,
+      exact("master") -> currentTag(),
+      exact("develop") -> nextMinor(),
+      prefix("release/") -> matching(),
+      prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
       any -> unknownVersion
     )
   }
