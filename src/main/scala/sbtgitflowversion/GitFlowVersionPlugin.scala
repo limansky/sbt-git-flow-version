@@ -66,7 +66,9 @@ object GitFlowVersionPlugin extends AutoPlugin {
     } yield calculated
 
     version match {
-      case Right(value) => value.toString
+      case Right(value) =>
+        logger.info(s"Version set to $value")
+        value.toString
       case Left(error) => sys.error(error)
     }
   }
@@ -84,7 +86,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}"))
   }
 
-  def previousTags(jGit: JGit): Either[String, Seq[String]] = {
+  private def previousTags(jGit: JGit): Either[String, Seq[String]] = {
     import scala.collection.JavaConverters._
 
     for {
