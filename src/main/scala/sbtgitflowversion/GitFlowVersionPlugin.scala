@@ -3,7 +3,7 @@ package sbtgitflowversion
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.git.JGit
-import org.eclipse.jgit.lib.{Constants, Repository}
+import org.eclipse.jgit.lib.{ Constants, Repository }
 import org.eclipse.jgit.revwalk.RevWalk
 import sbt._
 import sbt.Keys._
@@ -47,12 +47,12 @@ object GitFlowVersionPlugin extends AutoPlugin {
   }
 
   private def calculateVersion(
-    logger: Logger,
-    jGit: JGit,
-    policy: Seq[(BranchMatcher, VersionCalculator)],
-    revision: CurrentRevision,
-    tagMatcher: TagMatcher,
-    initialVersion: String
+      logger: Logger,
+      jGit: JGit,
+      policy: Seq[(BranchMatcher, VersionCalculator)],
+      revision: CurrentRevision,
+      tagMatcher: TagMatcher,
+      initialVersion: String
   ): String = {
     logger.info("Calculating version")
 
@@ -74,14 +74,15 @@ object GitFlowVersionPlugin extends AutoPlugin {
   }
 
   private def applyPolicy(
-    policy: Seq[(BranchMatcher, VersionCalculator)],
-    revision: CurrentRevision,
-    last: VersionNumber,
-    current: Option[VersionNumber]
+      policy: Seq[(BranchMatcher, VersionCalculator)],
+      revision: CurrentRevision,
+      last: VersionNumber,
+      current: Option[VersionNumber]
   ): Either[String, VersionNumber] = {
     policy.iterator
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
-      .find(_.isDefined).flatten
+      .find(_.isDefined)
+      .flatten
       .map { case (m, p) => p(last, current, m.extraction) }
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}"))
   }
@@ -90,7 +91,9 @@ object GitFlowVersionPlugin extends AutoPlugin {
     import scala.collection.JavaConverters._
 
     for {
-      head <- Option(jGit.repo.resolve(Constants.HEAD)).toRight("No HEAD commit found. Possible there is no git repository.").right
+      head <- Option(jGit.repo.resolve(Constants.HEAD))
+        .toRight("No HEAD commit found. Possible there is no git repository.")
+        .right
     } yield {
       val revWalk = new RevWalk(jGit.repo)
       val headCommit = revWalk.parseCommit(head)

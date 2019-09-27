@@ -27,11 +27,11 @@ object Version {
     if (ns.nonEmpty) {
       if (n < ns.length) {
         val pre = ns.take(n)
-        val post = Seq.fill(ns.length - n - 1)(0l)
+        val post = Seq.fill(ns.length - n - 1)(0L)
         VersionNumber((pre :+ (ns(n) + 1)) ++ post, versionNumber.tags, versionNumber.extras)
       } else {
-        val post = Seq.fill(n - ns.length)(0l)
-        VersionNumber(ns ++ post :+ 1l, versionNumber.tags, versionNumber.extras)
+        val post = Seq.fill(n - ns.length)(0L)
+        VersionNumber(ns ++ post :+ 1L, versionNumber.tags, versionNumber.extras)
       }
 
     } else {
@@ -41,7 +41,8 @@ object Version {
 
   val versionOrdering: Ordering[VersionNumber] = new Ordering[VersionNumber] {
     override def compare(x: VersionNumber, y: VersionNumber): Int = {
-      val pair = x.numbers.zipAll(y.numbers, 0l, 0l)
+      val pair = x.numbers
+        .zipAll(y.numbers, 0L, 0L)
         .find(p => java.lang.Long.compare(p._1, p._2) != 0)
 
       pair.map(p => java.lang.Long.compare(p._1, p._2)).getOrElse(0)

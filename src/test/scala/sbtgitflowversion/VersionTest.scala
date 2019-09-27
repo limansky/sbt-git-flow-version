@@ -1,7 +1,7 @@
 package sbtgitflowversion
 
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.{ FlatSpec, Matchers, OptionValues }
 import sbt.VersionNumber
 
 class VersionTest extends FlatSpec with Matchers with OptionValues with TableDrivenPropertyChecks {
