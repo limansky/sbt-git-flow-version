@@ -5,7 +5,7 @@ jdk: openjdk8
 sudo: false
 
 script:
-  - sbt ^test scripted
+  - sbt ^test
 
 cache:
   directories:
