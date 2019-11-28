@@ -24,7 +24,7 @@ Installation
 > NOTE: At the moment there is no stable version yet.  The plugin is under active development.
 
 ```Scala
-addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.1-SNAPSHOT")
+addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.1")
 ```
 
 Configuration
