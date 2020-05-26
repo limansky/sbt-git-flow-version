@@ -25,47 +25,51 @@ abstract class VersionCalculator(isSnapshot: Boolean) {
 }
 
 object VersionCalculator {
-  def lastVersion(isSnapshot: Boolean = false): VersionCalculator = new VersionCalculator(isSnapshot) {
-    override def doCalc(
-        previous: VersionNumber,
-        current: Option[VersionNumber],
-        matching: Option[String]
-    ): Either[String, VersionNumber] = {
-      Right(previous)
+  def lastVersion(isSnapshot: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        Right(previous)
+      }
     }
-  }
 
-  def lastVersionWithMatching(isSnapshot: Boolean = true): VersionCalculator = new VersionCalculator(isSnapshot) {
-    override def doCalc(
-        previous: VersionNumber,
-        current: Option[VersionNumber],
-        matching: Option[String]
-    ): Either[String, VersionNumber] = {
-      matching
-        .map(m => VersionNumber(previous.numbers, Seq(m), Seq.empty))
-        .toRight("Empty matching is not allowed for lastTagWithMatching policy")
+  def lastVersionWithMatching(isSnapshot: Boolean = true): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        matching
+          .map(m => VersionNumber(previous.numbers, Seq(m), Seq.empty))
+          .toRight("Empty matching is not allowed for lastTagWithMatching policy")
+      }
     }
-  }
 
-  def matching(isSnapshot: Boolean = true): VersionCalculator = new VersionCalculator(isSnapshot) {
-    override def doCalc(
-        previous: VersionNumber,
-        current: Option[VersionNumber],
-        matching: Option[String]
-    ): Either[String, VersionNumber] = {
-      matching.flatMap(Version.parse).toRight(s"Empty matching is not allowed for matching policy")
+  def matching(isSnapshot: Boolean = true): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        matching.flatMap(Version.parse).toRight(s"Empty matching is not allowed for matching policy")
+      }
     }
-  }
 
-  def currentTag(isSnapshot: Boolean = false): VersionCalculator = new VersionCalculator(isSnapshot) {
-    override def doCalc(
-        previous: VersionNumber,
-        current: Option[VersionNumber],
-        matching: Option[String]
-    ): Either[String, VersionNumber] = {
-      current.toRight("No tag defined for current version")
+  def currentTag(isSnapshot: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        current.toRight("No tag defined for current version")
+      }
     }
-  }
 
   def nextMajor(isSnapshot: Boolean = true): VersionCalculator = nextN(0, isSnapshot)
 
@@ -73,15 +77,16 @@ object VersionCalculator {
 
   def nextBuild(isSnapshot: Boolean = true): VersionCalculator = nextN(2, isSnapshot)
 
-  def nextN(n: Int, isSnapshot: Boolean = true): VersionCalculator = new VersionCalculator(isSnapshot) {
-    override def doCalc(
-        previous: VersionNumber,
-        current: Option[VersionNumber],
-        matching: Option[String]
-    ): Either[String, VersionNumber] = {
-      Right(Version.next(n)(previous))
+  def nextN(n: Int, isSnapshot: Boolean = true): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        Right(Version.next(n)(previous))
+      }
     }
-  }
 
   val unknownVersion: VersionCalculator = new VersionCalculator(false) {
     override def doCalc(

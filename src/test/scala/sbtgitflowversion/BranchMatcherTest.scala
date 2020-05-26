@@ -1,8 +1,10 @@
 package sbtgitflowversion
 
-import org.scalatest.{ FlatSpec, Matchers, OptionValues }
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class BranchMatcherTest extends FlatSpec with Matchers with OptionValues {
+class BranchMatcherTest extends AnyFlatSpec with Matchers with OptionValues {
 
   import BranchMatcher._
 

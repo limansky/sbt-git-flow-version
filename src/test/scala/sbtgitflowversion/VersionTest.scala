@@ -1,10 +1,12 @@
 package sbtgitflowversion
 
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{ FlatSpec, Matchers, OptionValues }
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import sbt.VersionNumber
 
-class VersionTest extends FlatSpec with Matchers with OptionValues with TableDrivenPropertyChecks {
+class VersionTest extends AnyFlatSpec with Matchers with OptionValues with TableDrivenPropertyChecks {
 
   "Version" should "increment major version" in {
     val data = Table(

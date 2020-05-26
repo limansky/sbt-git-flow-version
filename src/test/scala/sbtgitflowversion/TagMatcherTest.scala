@@ -1,10 +1,11 @@
 package sbtgitflowversion
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{ FlatSpec, Matchers }
 import sbt.VersionNumber
 
-class TagMatcherTest extends FlatSpec with Matchers with TableDrivenPropertyChecks {
+class TagMatcherTest extends AnyFlatSpec with Matchers with TableDrivenPropertyChecks {
 
   "TagMatcher" should "match raw version" in {
     val cases = Table(

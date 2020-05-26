@@ -13,13 +13,14 @@ object TagMatcher {
 
   def suffix(s: String): TagMatcher = prefixAndSuffix("", s)
 
-  def prefixAndSuffix(p: String, s: String): TagMatcher = new TagMatcher {
-    override def apply(tag: String): Option[VersionNumber] = {
-      if (tag.startsWith(p) && tag.endsWith(s)) {
-        Version.parse(tag.substring(p.length, tag.length - s.length))
-      } else {
-        None
+  def prefixAndSuffix(p: String, s: String): TagMatcher =
+    new TagMatcher {
+      override def apply(tag: String): Option[VersionNumber] = {
+        if (tag.startsWith(p) && tag.endsWith(s)) {
+          Version.parse(tag.substring(p.length, tag.length - s.length))
+        } else {
+          None
+        }
       }
     }
-  }
 }
