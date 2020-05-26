@@ -21,8 +21,6 @@ Java 8 and sbt 0.13.5+ or 1.x.  This plugin depends on sbt-git.
 Installation
 ------------
 
-> NOTE: At the moment there is no stable version yet.  The plugin is under active development.
-
 ```Scala
 addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.1")
 ```
