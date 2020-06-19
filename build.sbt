@@ -4,7 +4,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-git-flow-version",
-    crossSbtVersions := List("0.13.18", "1.3.10"),
+    crossSbtVersions := List("0.13.18", "1.3.12"),
     scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-feature"),
     addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0"),
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % Test,

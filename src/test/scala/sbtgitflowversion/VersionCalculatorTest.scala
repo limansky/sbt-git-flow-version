@@ -1,0 +1,3 @@
+package sbtgitflowversion
+
+class VersionCalculatorTest {}
