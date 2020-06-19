@@ -21,7 +21,7 @@ lazy val buildSettings = Seq(
   startYear := Some(2018),
   scmInfo := Some(ScmInfo(url("https://github.com/limansky/sbt-git-flow-version"), "scm:git:git@github.com:limansky/sbt-git-flow-version.git")),
   homepage := scmInfo.value map (_.browseUrl),
-  publishTo := sonatypePublishTo.value
+  publishTo := sonatypePublishToBundle.value
 )
 
 
