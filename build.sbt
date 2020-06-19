@@ -40,7 +40,7 @@ lazy val releaseSettings = Seq(
     releaseStepCommandAndRemaining("^ publishSigned"),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
+    releaseStepCommand("sonatypeBundleRelease"),
     pushChanges
   )
 )
