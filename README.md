@@ -53,6 +53,7 @@ There are also several built in implementations for `VersionCalculator`:
     The version is not snapshot by default.
   - `lastVersionWithMatching` - takes last version and append matching returned by `BranchMatcher`.  By default
     new version is snapshot.
+  - `lastVersionWithSuffix` - takes fixed suffix to append to the last version.  By default new version is snapshot.
   - `unknownVersion` - fails with unknown version message.
 
 So, the default policy is:

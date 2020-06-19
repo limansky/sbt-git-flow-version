@@ -5,7 +5,7 @@ import sbt.VersionNumber
 abstract class VersionCalculator(isSnapshot: Boolean) {
   val SNAPSHOT = "SNAPSHOT"
 
-  def doCalc(
+  protected def doCalc(
       previous: VersionNumber,
       current: Option[VersionNumber],
       matching: Option[String]
@@ -36,6 +36,17 @@ object VersionCalculator {
       }
     }
 
+  def lastVersionWithSuffix(suffix: String, isSnapshot: Boolean = true): VersionCalculator =
+    new VersionCalculator(isSnapshot) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        Right(VersionNumber(previous.numbers, Seq(suffix), Seq.empty))
+      }
+    }
+
   def lastVersionWithMatching(isSnapshot: Boolean = true): VersionCalculator =
     new VersionCalculator(isSnapshot) {
       override def doCalc(
@@ -45,7 +56,7 @@ object VersionCalculator {
       ): Either[String, VersionNumber] = {
         matching
           .map(m => VersionNumber(previous.numbers, Seq(m), Seq.empty))
-          .toRight("Empty matching is not allowed for lastTagWithMatching policy")
+          .toRight("Empty matching is not allowed for lastVersionWithMatching policy")
       }
     }
 
