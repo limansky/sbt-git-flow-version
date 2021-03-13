@@ -83,7 +83,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
       .find(_.isDefined)
       .flatten
-      .map { case (m, p) => p(last, current, m.extraction) }
+      .map { case (m, p) => p(current getOrElse last, current, m.extraction) }
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}"))
   }
 
