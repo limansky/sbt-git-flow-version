@@ -60,7 +60,6 @@ object GitFlowVersionPlugin extends AutoPlugin {
       val maxVersion = maxGlobalVersion(jGit, globalPolicy, tagMatcher, initial)
       val currentVersions = revision.currentTags.flatMap(tagMatcher(_))
       val maxCurrent = if (currentVersions.isEmpty) None else Some(currentVersions.max(Version.versionOrdering))
-
       for {
         last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
         calculated <- applyPolicy(policy, revision, last, maxCurrent, maxVersion).right
@@ -101,11 +100,14 @@ object GitFlowVersionPlugin extends AutoPlugin {
       current: Option[VersionNumber],
       maxVersion: Option[VersionNumber]
   ): Either[String, VersionNumber] = {
+
+    val max = List(Some(last), current, maxVersion).flatten.max(Version.versionOrdering)
+
     policy.iterator
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
       .find(_.isDefined)
       .flatten
-      .map { case (m, p) => p(current getOrElse last, current, maxVersion, m.extraction) }
+      .map { case (m, p) => p(current getOrElse last, current, max, m.extraction) }
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}"))
   }
 
@@ -136,7 +138,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     Seq(
       exact("master") -> currentTag(),
-      exact("develop") -> nextMinor(),
+      exact("develop") -> globalNextMinor(),
       prefix("release/") -> matching(),
       prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
       any -> unknownVersion

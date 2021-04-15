@@ -6,14 +6,14 @@ abstract class VersionCalculator(isSnapshot: Boolean, val globalVersion: Boolean
   protected def doCalc(
       previous: VersionNumber,
       current: Option[VersionNumber],
-      max: Option[VersionNumber],
+      max: VersionNumber,
       matching: Option[String]
   ): Either[String, VersionNumber]
 
   def apply(
       previous: VersionNumber,
       current: Option[VersionNumber],
-      max: Option[VersionNumber],
+      max: VersionNumber,
       matching: Option[String]
   ): Either[String, VersionNumber] = {
     doCalc(previous, current, max, matching).right.map { r =>
@@ -32,7 +32,7 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(previous)
@@ -48,7 +48,7 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(VersionNumber(previous.numbers, Seq(suffix), Seq.empty))
@@ -60,7 +60,7 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         matching
@@ -74,7 +74,7 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         matching.flatMap(Version.parse).toRight(s"Empty matching is not allowed for matching policy")
@@ -86,7 +86,7 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         current.toRight("No tag defined for current version")
@@ -107,10 +107,31 @@ object VersionCalculator {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
-          max: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(Version.next(n)(previous))
+      }
+    }
+
+  def globalNextMajor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    globalNextN(0, isSnapshot, globalVersion)
+
+  def globalNextMinor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    globalNextN(1, isSnapshot, globalVersion)
+
+  def globalNextBuild(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    globalNextN(2, isSnapshot, globalVersion)
+
+  def globalNextN(n: Int, isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          max: VersionNumber,
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        Right(Version.next(n)(max))
       }
     }
 
@@ -118,7 +139,7 @@ object VersionCalculator {
     override def doCalc(
         previous: VersionNumber,
         current: Option[VersionNumber],
-        max: Option[VersionNumber],
+        max: VersionNumber,
         matching: Option[String]
     ): Either[String, VersionNumber] = {
       Left(s"Don't know how to calculate version")
