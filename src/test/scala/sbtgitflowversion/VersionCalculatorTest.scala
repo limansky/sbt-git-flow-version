@@ -74,13 +74,13 @@ class VersionCalculatorTest extends AnyFlatSpec with Matchers {
   }
 
   it should "support globalNextX policies" in {
-    VersionCalculator.globalNextBuild()(prev, Some(cur), max, Some("foo")) shouldEqual Right(
+    VersionCalculator.nextGlobalBuild()(prev, Some(cur), max, Some("foo")) shouldEqual Right(
       VersionNumber("1.4.1-SNAPSHOT")
     )
-    VersionCalculator.globalNextMinor()(prev, Some(cur), max, Some("foo")) shouldEqual Right(
+    VersionCalculator.nextGlobalMinor()(prev, Some(cur), max, Some("foo")) shouldEqual Right(
       VersionNumber("1.5.0-SNAPSHOT")
     )
-    VersionCalculator.globalNextMajor(isSnapshot = false)(prev, Some(cur), max, Some("foo")) shouldEqual Right(
+    VersionCalculator.nextGlobalMajor(isSnapshot = false)(prev, Some(cur), max, Some("foo")) shouldEqual Right(
       VersionNumber("2.0.0")
     )
   }

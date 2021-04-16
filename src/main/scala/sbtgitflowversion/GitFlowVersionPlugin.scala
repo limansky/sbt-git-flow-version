@@ -138,7 +138,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     Seq(
       exact("master") -> currentTag(),
-      exact("develop") -> globalNextMinor(),
+      exact("develop") -> nextGlobalMinor(),
       prefix("release/") -> matching(),
       prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
       any -> unknownVersion

@@ -48,6 +48,8 @@ There are also several built in implementations for `VersionCalculator`:
     one with a maximal version.
   - `nextMajor`, `nextMinor`, `nextBuild`, `nextN` - increment major, minor, build or n-th number of
     a last version. The version is snapshot by default.
+  - `nextGlobalMajor`, `nextGlobalMinor`, `nextGlobalBuild`, `nextGlobalN` - same as `nextX`, but trying to
+    find maximal available version not only merged to current branch, but even for not merged and remote branches.
   - `matching` - take a version from matching returned by `BranchMatcher`. The version is snapshot by default.
   - `lastVersion` - previous version.  Version value is taken from last tag or `initialVersion` setting.
     The version is not snapshot by default.
@@ -56,12 +58,17 @@ There are also several built in implementations for `VersionCalculator`:
   - `lastVersionWithSuffix` - takes fixed suffix to append to the last version.  By default new version is snapshot.
   - `unknownVersion` - fails with unknown version message.
 
+  Note: calculating global version might take a long time if you have a lot of branches, so, to speed up the process
+  it doesn't take in account all branches, but only the ones for those `VersionCalculator` has a global version flag.
+  By default it `matching` policy.  This means, that by default when calculating `develop` version it use tags and
+  and `release/xxx` branches only.
+
 So, the default policy is:
 
 ```Scala
 Seq(
   exact("master") -> currentTag(),
-  exact("develop") -> nextMinor(),
+  exact("develop") -> nextGlobalMinor(),
   prefix("release/") -> matching(),
   prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
   any -> unknownVersion
@@ -71,7 +78,7 @@ Seq(
 Which can be described as following rules:
 
   - If branch name is "master" then the branch name is a current commit tag
-  - If branch name is "develop" then the branch name is a next minor version.
+  - If branch name is "develop" then the branch name is a next global minor version.
     E.g. if last version was `1.4.2`, the current version is `1.5.0-SNAPSHOT`.
   - If the branch name starts with "release/" then the version is taken from the
     branch name.  E.g. for the branch "release/2.12.85" the version is "2.12.85-SNAPSHOT".

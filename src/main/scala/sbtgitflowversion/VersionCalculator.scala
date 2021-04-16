@@ -114,16 +114,16 @@ object VersionCalculator {
       }
     }
 
-  def globalNextMajor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
-    globalNextN(0, isSnapshot, globalVersion)
+  def nextGlobalMajor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(0, isSnapshot, globalVersion)
 
-  def globalNextMinor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
-    globalNextN(1, isSnapshot, globalVersion)
+  def nextGlobalMinor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(1, isSnapshot, globalVersion)
 
-  def globalNextBuild(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
-    globalNextN(2, isSnapshot, globalVersion)
+  def nextGlobalBuild(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(2, isSnapshot, globalVersion)
 
-  def globalNextN(n: Int, isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+  def nextGlobalN(n: Int, isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
     new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
