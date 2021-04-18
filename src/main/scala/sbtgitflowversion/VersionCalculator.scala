@@ -2,56 +2,65 @@ package sbtgitflowversion
 
 import sbt.VersionNumber
 
-abstract class VersionCalculator(isSnapshot: Boolean) {
-  val SNAPSHOT = "SNAPSHOT"
-
+abstract class VersionCalculator(isSnapshot: Boolean, val globalVersion: Boolean) {
   protected def doCalc(
       previous: VersionNumber,
       current: Option[VersionNumber],
+      max: VersionNumber,
       matching: Option[String]
   ): Either[String, VersionNumber]
 
   def apply(
       previous: VersionNumber,
       current: Option[VersionNumber],
+      max: VersionNumber,
       matching: Option[String]
   ): Either[String, VersionNumber] = {
-    doCalc(previous, current, matching).right.map { r =>
-      if (isSnapshot && !r.tags.contains(SNAPSHOT)) {
-        VersionNumber(r.numbers, r.tags :+ SNAPSHOT, r.extras)
+    doCalc(previous, current, max, matching).right.map { r =>
+      if (isSnapshot && !r.tags.contains(VersionCalculator.SNAPSHOT)) {
+        VersionNumber(r.numbers, r.tags :+ VersionCalculator.SNAPSHOT, r.extras)
       } else r
     }
   }
 }
 
 object VersionCalculator {
-  def lastVersion(isSnapshot: Boolean = false): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  val SNAPSHOT = "SNAPSHOT"
+
+  def lastVersion(isSnapshot: Boolean = false, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(previous)
       }
     }
 
-  def lastVersionWithSuffix(suffix: String, isSnapshot: Boolean = true): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  def lastVersionWithSuffix(
+      suffix: String,
+      isSnapshot: Boolean = true,
+      globalVersion: Boolean = false
+  ): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(VersionNumber(previous.numbers, Seq(suffix), Seq.empty))
       }
     }
 
-  def lastVersionWithMatching(isSnapshot: Boolean = true): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  def lastVersionWithMatching(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         matching
@@ -60,49 +69,77 @@ object VersionCalculator {
       }
     }
 
-  def matching(isSnapshot: Boolean = true): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  def matching(isSnapshot: Boolean = true, globalVersion: Boolean = true): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         matching.flatMap(Version.parse).toRight(s"Empty matching is not allowed for matching policy")
       }
     }
 
-  def currentTag(isSnapshot: Boolean = false): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  def currentTag(isSnapshot: Boolean = false, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         current.toRight("No tag defined for current version")
       }
     }
 
-  def nextMajor(isSnapshot: Boolean = true): VersionCalculator = nextN(0, isSnapshot)
+  def nextMajor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextN(0, isSnapshot, globalVersion)
 
-  def nextMinor(isSnapshot: Boolean = true): VersionCalculator = nextN(1, isSnapshot)
+  def nextMinor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextN(1, isSnapshot, globalVersion)
 
-  def nextBuild(isSnapshot: Boolean = true): VersionCalculator = nextN(2, isSnapshot)
+  def nextBuild(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextN(2, isSnapshot, globalVersion)
 
-  def nextN(n: Int, isSnapshot: Boolean = true): VersionCalculator =
-    new VersionCalculator(isSnapshot) {
+  def nextN(n: Int, isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
       override def doCalc(
           previous: VersionNumber,
           current: Option[VersionNumber],
+          max: VersionNumber,
           matching: Option[String]
       ): Either[String, VersionNumber] = {
         Right(Version.next(n)(previous))
       }
     }
 
-  val unknownVersion: VersionCalculator = new VersionCalculator(false) {
+  def nextGlobalMajor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(0, isSnapshot, globalVersion)
+
+  def nextGlobalMinor(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(1, isSnapshot, globalVersion)
+
+  def nextGlobalBuild(isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    nextGlobalN(2, isSnapshot, globalVersion)
+
+  def nextGlobalN(n: Int, isSnapshot: Boolean = true, globalVersion: Boolean = false): VersionCalculator =
+    new VersionCalculator(isSnapshot, globalVersion) {
+      override def doCalc(
+          previous: VersionNumber,
+          current: Option[VersionNumber],
+          max: VersionNumber,
+          matching: Option[String]
+      ): Either[String, VersionNumber] = {
+        Right(Version.next(n)(max))
+      }
+    }
+
+  val unknownVersion: VersionCalculator = new VersionCalculator(false, false) {
     override def doCalc(
         previous: VersionNumber,
         current: Option[VersionNumber],
+        max: VersionNumber,
         matching: Option[String]
     ): Either[String, VersionNumber] = {
       Left(s"Don't know how to calculate version")

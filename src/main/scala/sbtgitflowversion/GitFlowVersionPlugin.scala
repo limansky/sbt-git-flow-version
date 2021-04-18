@@ -55,15 +55,16 @@ object GitFlowVersionPlugin extends AutoPlugin {
       initialVersion: String
   ): String = {
     logger.info("Calculating version")
-
-    val currentVersions = revision.currentTags.flatMap(tagMatcher(_))
-    val maxCurrent = if (currentVersions.isEmpty) None else Some(currentVersions.max(Version.versionOrdering))
-
-    val version = for {
-      initial <- Version.parse(initialVersion).toRight("Invalid initial version").right
-      last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
-      calculated <- applyPolicy(policy, revision, last, maxCurrent).right
-    } yield calculated
+    val globalPolicy = policy.filter(_._2.globalVersion)
+    val version = Version.parse(initialVersion).toRight("Invalid initial version").right.flatMap { initial =>
+      val maxVersion = maxGlobalVersion(jGit, globalPolicy, tagMatcher, initial)
+      val currentVersions = revision.currentTags.flatMap(tagMatcher(_))
+      val maxCurrent = if (currentVersions.isEmpty) None else Some(currentVersions.max(Version.versionOrdering))
+      for {
+        last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
+        calculated <- applyPolicy(policy, revision, last, maxCurrent, maxVersion).right
+      } yield calculated
+    }
 
     version match {
       case Right(value) =>
@@ -73,25 +74,48 @@ object GitFlowVersionPlugin extends AutoPlugin {
     }
   }
 
+  private def maxGlobalVersion(
+      jGit: JGit,
+      policy: Seq[(BranchMatcher, VersionCalculator)],
+      tagMatcher: TagMatcher,
+      initial: VersionNumber
+  ): Option[VersionNumber] = {
+    lazy val availableVersions = jGit.remoteBranches.filter(_.startsWith("origin/")) flatMap { bn =>
+      val version = for {
+        _ <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), initial, None, None).right
+        last <- previousTags(jGit, bn).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
+        v <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), last, None, None).right
+      } yield v
+
+      version.right.toOption
+    }
+
+    if (availableVersions.nonEmpty) Some(availableVersions.max(Version.versionOrdering)) else None
+  }
+
   private def applyPolicy(
       policy: Seq[(BranchMatcher, VersionCalculator)],
       revision: CurrentRevision,
       last: VersionNumber,
-      current: Option[VersionNumber]
+      current: Option[VersionNumber],
+      maxVersion: Option[VersionNumber]
   ): Either[String, VersionNumber] = {
+
+    val max = List(Some(last), current, maxVersion).flatten.max(Version.versionOrdering)
+
     policy.iterator
       .map { case (m, p) => m(revision.branchName).map(_ -> p) }
       .find(_.isDefined)
       .flatten
-      .map { case (m, p) => p(current getOrElse last, current, m.extraction) }
+      .map { case (m, p) => p(current getOrElse last, current, max, m.extraction) }
       .getOrElse(Left(s"No applicable policy for branch ${revision.branchName}"))
   }
 
-  private def previousTags(jGit: JGit): Either[String, Seq[String]] = {
+  private def previousTags(jGit: JGit, ref: String = Constants.HEAD): Either[String, Seq[String]] = {
     import scala.collection.JavaConverters._
 
     for {
-      head <- Option(jGit.repo.resolve(Constants.HEAD))
+      head <- Option(jGit.repo.resolve(ref))
         .toRight("No HEAD commit found. Possible there is no git repository.")
         .right
     } yield {
@@ -114,7 +138,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
 
     Seq(
       exact("master") -> currentTag(),
-      exact("develop") -> nextMinor(),
+      exact("develop") -> nextGlobalMinor(),
       prefix("release/") -> matching(),
       prefixes("feature/", "bugfix/", "hotfix/") -> lastVersionWithMatching(),
       any -> unknownVersion
