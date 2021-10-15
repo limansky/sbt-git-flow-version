@@ -24,7 +24,7 @@ Installation
 ------------
 
 ```Scala
-addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.3")
+addSbtPlugin("me.limansky" % "sbt-git-flow-version" % "0.4")
 ```
 
 Configuration
