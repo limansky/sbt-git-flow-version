@@ -1,5 +1,7 @@
 import ReleaseTransformations._
 
+Global / excludeLintKeys += crossSbtVersions
+
 lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
