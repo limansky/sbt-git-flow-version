@@ -4,11 +4,11 @@ lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-git-flow-version",
-    crossSbtVersions := List("0.13.18", "1.2.8"),
+    crossSbtVersions := List("1.2.8"),
     scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-feature"),
-    addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0"),
+    addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.2"),
     libraryDependencies ++= {
-      val scalaTestV = "3.2.6"
+      val scalaTestV = "3.2.10"
 
       Seq(
         "org.scalatest" %% "scalatest-core"                 % scalaTestV        % Test,
@@ -35,7 +35,7 @@ lazy val buildSettings = Seq(
 
 lazy val releaseSettings = Seq(
   releaseCrossBuild := true,
-  releaseTagName := { (version in ThisBuild).value },
+  releaseTagName := { (ThisBuild / version).value },
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,

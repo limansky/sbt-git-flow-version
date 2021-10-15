@@ -11,7 +11,7 @@ jobs:
     name: Build and test
     strategy:
       matrix:
-        sbt: [ '0.13.18', '1.2.8' ]
+        sbt: [ '1.2.8' ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

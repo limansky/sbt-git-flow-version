@@ -16,7 +16,9 @@ branches and change versions automatically without changing your code.
 Requirements
 ------------
 
-Java 8 and sbt 0.13.5+ or 1.x.  This plugin depends on sbt-git.
+Java 8 and sbt 1.x.  This plugin depends on sbt-git.
+
+  Note: if you are still using sbt 0.13.5+, you can use `sbt-git-flow-version` 0.3 or eariler.
 
 Installation
 ------------
