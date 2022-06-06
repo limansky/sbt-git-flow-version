@@ -8,9 +8,9 @@ lazy val sbtGitFlowVersion = (project in file("."))
     name := "sbt-git-flow-version",
     crossSbtVersions := List("1.2.8"),
     scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-feature"),
-    addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.2"),
+    addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.0"),
     libraryDependencies ++= {
-      val scalaTestV = "3.2.10"
+      val scalaTestV = "3.2.12"
 
       Seq(
         "org.scalatest" %% "scalatest-core"                 % scalaTestV        % Test,

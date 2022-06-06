@@ -1,8 +1,8 @@
 package sbtgitflowversion
 
-import com.typesafe.sbt.GitPlugin
-import com.typesafe.sbt.SbtGit.git
-import com.typesafe.sbt.git.JGit
+import com.github.sbt.git.GitPlugin
+import com.github.sbt.git.SbtGit.git
+import com.github.sbt.git.JGit
 import org.eclipse.jgit.lib.{ Constants, Repository }
 import org.eclipse.jgit.revwalk.RevWalk
 import sbt._
@@ -31,7 +31,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
       initialVersion := "1.0.0",
       tagMatcher := TagMatcher.raw,
       versionPolicy := defaultPolicy,
-      version in ThisBuild := calculateVersion(
+      ThisBuild / version := calculateVersion(
         sLog.value,
         JGit(baseDirectory.value),
         versionPolicy.value,
