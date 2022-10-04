@@ -58,6 +58,7 @@ There are also several built in implementations for `VersionCalculator`:
   - `lastVersionWithMatching` - takes last version and append matching returned by `BranchMatcher`.  By default
     new version is snapshot.
   - `lastVersionWithSuffix` - takes fixed suffix to append to the last version.  By default new version is snapshot.
+  - `fixed` - takes flag if the version is snapshot and numbers.  Just fixed version.
   - `unknownVersion` - fails with unknown version message.
 
   Note: calculating global version might take a long time if you have a lot of branches, so, to speed up the process
