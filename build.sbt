@@ -10,7 +10,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-feature"),
     addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.0"),
     libraryDependencies ++= {
-      val scalaTestV = "3.2.12"
+      val scalaTestV = "3.2.14"
 
       Seq(
         "org.scalatest" %% "scalatest-core"                 % scalaTestV        % Test,
