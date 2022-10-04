@@ -135,6 +135,15 @@ object VersionCalculator {
       }
     }
 
+  def fixed(isSnapshot: Boolean, parts: Long*): VersionCalculator = new VersionCalculator(isSnapshot, false) {
+    override protected def doCalc(
+        previous: VersionNumber,
+        current: Option[VersionNumber],
+        max: VersionNumber,
+        matching: Option[String]
+    ): Either[String, VersionNumber] = Right(VersionNumber(parts.toSeq, Seq.empty, Seq.empty))
+  }
+
   val unknownVersion: VersionCalculator = new VersionCalculator(false, false) {
     override def doCalc(
         previous: VersionNumber,

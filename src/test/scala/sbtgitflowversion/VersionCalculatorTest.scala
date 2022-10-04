@@ -84,4 +84,11 @@ class VersionCalculatorTest extends AnyFlatSpec with Matchers {
       VersionNumber("2.0.0")
     )
   }
+
+  it should "support fixed policy" in {
+    VersionCalculator.fixed(true, 1, 2)(prev, Some(cur), max, Some("x")) shouldEqual Right(
+      VersionNumber("1.2-SNAPSHOT")
+    )
+    VersionCalculator.fixed(false, 3, 4, 5)(prev, None, max, None) shouldEqual Right(VersionNumber("3.4.5"))
+  }
 }
