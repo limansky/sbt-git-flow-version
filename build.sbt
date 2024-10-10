@@ -6,17 +6,28 @@ lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-git-flow-version",
-    crossSbtVersions := List("1.2.8"),
-    scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-feature"),
-    addSbtPlugin("com.github.sbt" % "sbt-git" % "2.0.1"),
+    crossScalaVersions := List("2.12.20", "3.3.4"),
+    scalacOptions := {
+      scalaBinaryVersion.value match {
+        case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature")
+        case _      => Seq("-deprecation", "-unchecked", "-feature")
+      }
+    },
+    addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0"),
     libraryDependencies ++= {
-      val scalaTestV = "3.2.14"
+      val scalaTestV = "3.2.19"
 
       Seq(
         "org.scalatest" %% "scalatest-core"                 % scalaTestV        % Test,
         "org.scalatest" %% "scalatest-shouldmatchers"       % scalaTestV        % Test,
         "org.scalatest" %% "scalatest-flatspec"             % scalaTestV        % Test
       )
+    },
+    pluginCrossBuild / sbtVersion := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.2.8"
+        case _      => "2.0.0-M2"
+      }
     },
     buildSettings,
     releaseSettings

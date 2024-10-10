@@ -56,13 +56,13 @@ object GitFlowVersionPlugin extends AutoPlugin {
   ): String = {
     logger.info("Calculating version")
     val globalPolicy = policy.filter(_._2.globalVersion)
-    val version = Version.parse(initialVersion).toRight("Invalid initial version").right.flatMap { initial =>
+    val version = Version.parse(initialVersion).toRight("Invalid initial version").flatMap { initial =>
       val maxVersion = maxGlobalVersion(jGit, globalPolicy, tagMatcher, initial)
       val currentVersions = revision.currentTags.flatMap(tagMatcher(_))
       val maxCurrent = if (currentVersions.isEmpty) None else Some(currentVersions.max(Version.versionOrdering))
       for {
-        last <- previousTags(jGit).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
-        calculated <- applyPolicy(policy, revision, last, maxCurrent, maxVersion).right
+        last <- previousTags(jGit).map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial))
+        calculated <- applyPolicy(policy, revision, last, maxCurrent, maxVersion)
       } yield calculated
     }
 
@@ -82,12 +82,12 @@ object GitFlowVersionPlugin extends AutoPlugin {
   ): Option[VersionNumber] = {
     lazy val availableVersions = jGit.remoteBranches.filter(_.startsWith("origin/")) flatMap { bn =>
       val version = for {
-        _ <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), initial, None, None).right
-        last <- previousTags(jGit, bn).right.map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial)).right
-        v <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), last, None, None).right
+        _ <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), initial, None, None)
+        last <- previousTags(jGit, bn).map(_.flatMap(tagMatcher(_)).lastOption.getOrElse(initial))
+        v <- applyPolicy(policy, CurrentRevision(bn.substring(7), None, Nil), last, None, None)
       } yield v
 
-      version.right.toOption
+      version.toOption
     }
 
     if (availableVersions.nonEmpty) Some(availableVersions.max(Version.versionOrdering)) else None
@@ -114,21 +114,19 @@ object GitFlowVersionPlugin extends AutoPlugin {
   private def previousTags(jGit: JGit, ref: String = Constants.HEAD): Either[String, Seq[String]] = {
     import scala.collection.JavaConverters._
 
-    for {
-      head <- Option(jGit.repo.resolve(ref))
-        .toRight("No HEAD commit found. Possible there is no git repository.")
-        .right
-    } yield {
-      val revWalk = new RevWalk(jGit.repo)
-      val headCommit = revWalk.parseCommit(head)
-      val allTags = jGit.porcelain.tagList().call().asScala.toList
+    Option(jGit.repo.resolve(ref))
+      .toRight("No HEAD commit found. Possible there is no git repository.")
+      .map { head =>
+        val revWalk = new RevWalk(jGit.repo)
+        val headCommit = revWalk.parseCommit(head)
+        val allTags = jGit.porcelain.tagList().call().asScala.toList
 
-      allTags
-        .map(ref => (Repository.shortenRefName(ref.getName), revWalk.parseCommit(ref.getObjectId)))
-        .filter(x => revWalk.isMergedInto(x._2, headCommit) && x._2 != headCommit)
-        .sortBy(_._2.getCommitTime)
-        .map(_._1)
-    }
+        allTags
+          .map(ref => (Repository.shortenRefName(ref.getName), revWalk.parseCommit(ref.getObjectId)))
+          .filter(x => revWalk.isMergedInto(x._2, headCommit) && x._2 != headCommit)
+          .sortBy(_._2.getCommitTime)
+          .map(_._1)
+      }
 
   }
 

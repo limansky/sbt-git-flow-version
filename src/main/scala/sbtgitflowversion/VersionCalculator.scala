@@ -16,7 +16,7 @@ abstract class VersionCalculator(isSnapshot: Boolean, val globalVersion: Boolean
       max: VersionNumber,
       matching: Option[String]
   ): Either[String, VersionNumber] = {
-    doCalc(previous, current, max, matching).right.map { r =>
+    doCalc(previous, current, max, matching).map { r =>
       if (isSnapshot && !r.tags.contains(VersionCalculator.SNAPSHOT)) {
         VersionNumber(r.numbers, r.tags :+ VersionCalculator.SNAPSHOT, r.extras)
       } else r
