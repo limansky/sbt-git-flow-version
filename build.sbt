@@ -2,11 +2,15 @@ import ReleaseTransformations._
 
 Global / excludeLintKeys += crossSbtVersions
 
+val scala2 = "2.12.20"
+val scala3 = "3.3.4"
+
 lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-git-flow-version",
-    crossScalaVersions := List("2.12.20", "3.3.4"),
+    crossScalaVersions := List(scala2, scala3),
+    scalaVersion := scala2,
     scalacOptions := {
       scalaBinaryVersion.value match {
         case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature")
