@@ -24,7 +24,7 @@ object GitFlowVersionPlugin extends AutoPlugin {
     type VersionCalculator = sbtgitflowversion.VersionCalculator
   }
 
-  override def projectSettings: Seq[Def.Setting[_]] = {
+  override def projectSettings: Seq[Def.Setting[?]] = {
     import GitFlowVersionKeys._
 
     Seq(

@@ -22,7 +22,7 @@ object BranchMatcher {
   def prefix(p: String): BranchMatcher =
     new BranchMatcher {
       override def apply(branch: String): Option[Matching] = {
-        if (branch startsWith p) {
+        if (branch `startsWith` p) {
           Some(Matching(branch, Some(branch.substring(p.length))))
         } else None
       }
