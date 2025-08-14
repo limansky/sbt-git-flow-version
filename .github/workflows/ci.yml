@@ -27,7 +27,7 @@ jobs:
       uses: sbt/setup-sbt@v1
 
     - name: Verify formatting
-      run: sbt scalafmtCheckAll
+      run: sbt scalafmtCheckAll scalafmtSbtCheck
 
     - name: Run tests sbt 1.x
       if: ${{ matrix.sbt == 1 }}
