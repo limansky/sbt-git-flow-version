@@ -35,7 +35,7 @@ jobs:
 
     - name: Run tests sbt 2.x
       if: ${{ matrix.sbt == 2 }}
-      run: sbt ++3.6.4 test scripted
+      run: sbt ++3.7.2 test scripted
 
   publish:
     name: Publish artifacts
