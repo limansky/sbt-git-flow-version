@@ -13,7 +13,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     scalaVersion                  := scala2,
     scalacOptions                 := {
       scalaBinaryVersion.value match {
-        case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature", "release:8")
+        case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature", "-release:8")
         case _      => Seq("-deprecation", "-unchecked", "-feature")
       }
     },
