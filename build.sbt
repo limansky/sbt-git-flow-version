@@ -3,7 +3,7 @@ import ReleaseTransformations._
 Global / excludeLintKeys += crossSbtVersions
 
 val scala2 = "2.12.21"
-val scala3 = "3.7.3"
+val scala3 = "3.8.2"
 
 lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
@@ -13,7 +13,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     scalaVersion                  := scala2,
     scalacOptions                 := {
       scalaBinaryVersion.value match {
-        case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature")
+        case "2.12" => Seq("-deprecation", "-unchecked", "-Xlint", "-feature", "release:8")
         case _      => Seq("-deprecation", "-unchecked", "-feature")
       }
     },
@@ -30,7 +30,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.2.8"
-        case _      => "2.0.0-RC8"
+        case _      => "2.0.0-RC9"
       }
     },
     buildSettings,
