@@ -3,7 +3,7 @@ import ReleaseTransformations._
 Global / excludeLintKeys += crossSbtVersions
 
 val scala2 = "2.12.21"
-val scala3 = "3.8.2"
+val scala3 = "3.8.3"
 
 lazy val sbtGitFlowVersion = (project in file("."))
   .enablePlugins(SbtPlugin)
@@ -19,7 +19,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     },
     addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0"),
     libraryDependencies ++= {
-      val scalaTestV = "3.2.19"
+      val scalaTestV = "3.2.20"
 
       Seq(
         "org.scalatest" %% "scalatest-core"           % scalaTestV % Test,
@@ -30,7 +30,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.2.8"
-        case _      => "2.0.0-RC9"
+        case _      => "2.0.0-RC10"
       }
     },
     buildSettings,
