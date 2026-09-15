@@ -17,7 +17,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
         case _      => Seq("-deprecation", "-unchecked", "-feature")
       }
     },
-    addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0"),
+    addSbtPlugin("com.github.sbt" % "sbt-git" % "2.2.0"),
     libraryDependencies ++= {
       val scalaTestV = "3.2.20"
 
@@ -30,7 +30,7 @@ lazy val sbtGitFlowVersion = (project in file("."))
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.2.8"
-        case _      => "2.0.0"
+        case _      => "2.0.8"
       }
     },
     buildSettings,
